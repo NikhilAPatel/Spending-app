@@ -1,0 +1,203 @@
+import Foundation
+
+/// Merchant patterns -> category. Patterns match at the start of a word in the normalized
+/// description (uppercase, punctuation stripped), and longer patterns win, so
+/// "UBER EATS" (Dining) beats "UBER" (Transportation). User rules always beat these.
+enum BuiltInRules {
+    static let all: [(pattern: String, category: String)] = groceries + dining + transportation + travel
+        + shopping + subscriptions + utilities + housing + health + personalCare + entertainment
+        + fees + cash + insurance + taxes + giving + education + pets + peer + transfers + income
+
+    private static func rules(_ category: String, _ patterns: [String]) -> [(pattern: String, category: String)] {
+        patterns.map { ($0, category) }
+    }
+
+    static let groceries = rules("Groceries", [
+        "WHOLEFDS", "WHOLE FOODS", "WHOLEFOODS", "TRADER JOE", "SAFEWAY", "KROGER", "PUBLIX", "ALDI",
+        "COSTCO WHSE", "COSTCO", "WEGMANS", "H E B", "HEB", "SPROUTS", "GIANT EAGLE", "STOP SHOP",
+        "FOOD LION", "ALBERTSONS", "VONS", "RALPHS", "MEIJER", "HARRIS TEETER", "INSTACART", "FRESHDIRECT",
+        "GROCERY", "GROCERIES", "H MART", "99 RANCH", "FOOD BAZAAR", "KEY FOOD", "FAIRWAY", "SHOPRITE",
+        "HANNAFORD", "WINCO", "FOOD 4 LESS", "SMART FINAL", "AMAZON FRESH", "AMZN FRESH", "GORILLAS",
+        "WEEE", "THRIVE MARKET", "MARKET BASKET", "STATER BROS", "LIDL",
+    ])
+
+    static let dining = rules("Dining", [
+        "STARBUCKS", "DUNKIN", "MCDONALD", "CHIPOTLE", "SWEETGREEN", "CAVA", "PANERA", "CHICK FIL A",
+        "TACO BELL", "WENDY", "BURGER KING", "FIVE GUYS", "SHAKE SHACK", "IN N OUT", "DOMINO", "PIZZA HUT",
+        "PAPA JOHN", "DOORDASH", "DD DOORDASH", "GRUBHUB", "UBER EATS", "UBEREATS", "POSTMATES",
+        "SEAMLESS", "CAVIAR", "TST", "TOAST", "RESTAURANT", "RESTAURAN", "CAFE", "COFFEE", "PIZZA",
+        "PIZZERIA", "GRILL", "SUSHI", "RAMEN", "TAQUERIA", "BURGER", "BAKERY", "BISTRO", "TAVERN",
+        "BLUE BOTTLE", "PEETS", "PHILZ", "PRET A MANGER", "JUST SALAD", "DIG INN", "CHOPT", "NOODLES",
+        "PANDA EXPRESS", "POPEYES", "KFC", "SUBWAY 0", "JERSEY MIKE", "JIMMY JOHN", "WINGSTOP", "DINER",
+        "STEAKHOUSE", "KITCHEN ", "BRASSERIE", "TRATTORIA", "OSTERIA", "CANTINA", "BBQ", "DELI ",
+        "BAGEL", "DONUT", "JUICE", "SMOOTHIE", "TEA ", "BOBA", "BAR ", "BREWING", "BREWERY", "WINE BAR",
+        "SQ SWEETGREEN", "OPENTABLE", "RESY", "TOCK",
+    ])
+
+    static let transportation = rules("Transportation", [
+        "UBER", "LYFT", "SHELL", "CHEVRON", "EXXON", "EXXONMOBIL", "MOBIL", "BP ", "ARCO", "SUNOCO",
+        "CITGO", "VALERO", "SPEEDWAY", "MARATHON PETRO", "PHILLIPS 66", "76 ", "CIRCLE K", "GAS STATION",
+        "FUEL", "PARKING", "PARKMOBILE", "SPOTHERO", "SP PLUS", "LAZ PARKING", "ICON PARKING",
+        "E ZPASS", "EZPASS", "E Z PASS", "FASTRAK", "SUNPASS", "TOLL ", "MTA ", "NYCT", "OMNY", "CLIPPER",
+        "BART", "WMATA", "SEPTA", "MBTA", "CALTRAIN", "METRO TRANSIT", "NJ TRANSIT", "LIRR", "PATH ",
+        "CITI BIKE", "CITIBIKE", "LIME ", "BIRD ", "REVEL", "CHARGEPOINT", "EVGO", "ELECTRIFY AMERICA",
+        "TESLA SUPERCHARGER", "TESLA INC SUPERCHARGER", "JIFFY LUBE", "CAR WASH", "AUTOZONE",
+        "PEP BOYS", "DMV", "CURB ", "VIA TRANSPORTATION", "WAYMO",
+    ])
+
+    static let travel = rules("Travel", [
+        "DELTA AIR", "DELTA ", "UNITED AIRLINES", "UNITED AIR", "AMERICAN AIR", "AMERICAN AIRLINES",
+        "SOUTHWEST", "JETBLUE", "ALASKA AIR", "SPIRIT AIRL", "FRONTIER AIRLINES", "HAWAIIAN AIR",
+        "BRITISH AIRWAYS", "AIR FRANCE", "LUFTHANSA", "EMIRATES", "AIR CANADA", "VIRGIN ATLANTIC",
+        "AIRBNB", "VRBO", "MARRIOTT", "HILTON", "HYATT", "IHG", "HOLIDAY INN", "FOUR SEASONS", "RITZ",
+        "WESTIN", "SHERATON", "W HOTEL", "ACE HOTEL", "HOTEL", "MOTEL", "RESORT", "INN ", "EXPEDIA",
+        "BOOKING COM", "HOTELS COM", "KAYAK", "PRICELINE", "HOPPER", "HERTZ", "AVIS", "ENTERPRISE RENT",
+        "NATIONAL CAR", "BUDGET RENT", "SIXT", "TURO", "AMTRAK", "CLEAR CLEARME", "CLEARME", "TSA PRECHECK",
+        "GLOBAL ENTRY", "AIRLINE", "AIRLINES", "AIRWAYS", "AIRPORT", "DUTY FREE", "CHASE TRAVEL",
+        "AMEX TRAVEL", "CAPITAL ONE TRAVEL", "NORWEGIAN CRUISE", "ROYAL CARIBBEAN", "CARNIVAL",
+    ])
+
+    static let shopping = rules("Shopping", [
+        "AMAZON", "AMZN", "AMAZON MKTPL", "TARGET", "WALMART", "WAL MART", "WM SUPERCENTER", "BEST BUY",
+        "APPLE STORE", "APPLE COM US", "EBAY", "ETSY", "IKEA", "HOME DEPOT", "LOWES", "LOWE S", "WAYFAIR",
+        "NORDSTROM", "MACY", "ZARA", "UNIQLO", "NIKE", "ADIDAS", "LULULEMON", "TJ MAXX", "TJMAXX",
+        "MARSHALLS", "HOMEGOODS", "GAP ", "OLD NAVY", "BANANA REPUBLIC", "J CREW", "JCREW", "SAMS CLUB",
+        "SHEIN", "TEMU", "ALIEXPRESS", "BLOOMINGDALE", "SAKS", "NEIMAN", "BERGDORF", "SSENSE", "FARFETCH",
+        "REI ", "PATAGONIA", "DICK S SPORTING", "DICKS SPORTING", "BED BATH", "CRATE BARREL", "WILLIAMS SONOMA",
+        "POTTERY BARN", "WEST ELM", "CB2", "RH ", "CONTAINER STORE", "STAPLES", "OFFICE DEPOT", "MICHAELS",
+        "JOANN", "BARNES NOBLE", "BOOKSTORE", "WARBY PARKER", "EVERLANE", "ALLBIRDS", "BONOBOS", "COS ",
+        "MADEWELL", "ANTHROPOLOGIE", "URBAN OUTFITTERS", "FREE PEOPLE", "ABERCROMBIE", "HOLLISTER",
+        "FOREVER 21", "H M ", "DSW", "FOOT LOCKER", "VICTORIA S SECRET", "BATH BODY", "DOLLAR TREE",
+        "DOLLAR GENERAL", "FAMILY DOLLAR", "FIVE BELOW", "BEST BUY", "B H PHOTO", "NEWEGG", "MICRO CENTER",
+        "SHOPIFY", "SHOP PAY",
+    ])
+
+    static let subscriptions = rules("Subscriptions", [
+        "NETFLIX", "SPOTIFY", "HULU", "DISNEY PLUS", "DISNEYPLUS", "DISNEY", "HBO MAX", "HBOMAX", "MAX COM",
+        "YOUTUBE PREMIUM", "YOUTUBEPREMIUM", "YOUTUBE TV", "GOOGLE YOUTUBE", "APPLE COM BILL", "ITUNES",
+        "ICLOUD", "GOOGLE ONE", "GOOGLE STORAGE", "GOOGLE WORKSPACE", "GSUITE", "PARAMOUNT", "PEACOCK",
+        "AUDIBLE", "KINDLE UNLTD", "KINDLE SVCS", "PRIME VIDEO", "AMAZON PRIME", "AMZN PRIME", "PRIME MEMBERSHIP",
+        "NYTIMES", "NYT ", "NEW YORK TIMES", "WSJ", "WALL STREET JOURNAL", "WASHINGTON POST", "ECONOMIST",
+        "THE ATLANTIC", "NEW YORKER", "BLOOMBERG", "PATREON", "SUBSTACK", "OPENAI", "CHATGPT", "ANTHROPIC",
+        "CLAUDE AI", "MICROSOFT", "MSFT", "ADOBE", "DROPBOX", "GITHUB", "NOTION", "1PASSWORD", "LASTPASS",
+        "SIRIUSXM", "SIRIUS XM", "PELOTON", "STRAVA", "DUOLINGO", "HEADSPACE", "CALM COM", "MASTERCLASS",
+        "LINKEDIN", "ZOOM US", "SLACK", "CANVA", "FIGMA", "GRAMMARLY", "EXPRESSVPN", "NORDVPN", "PLAYSTATION NETWORK",
+        "XBOX GAME PASS", "NINTENDO SWITCH ONLINE", "CRUNCHYROLL", "STARZ", "SHOWTIME", "ESPN PLUS",
+        "APPLE MUSIC", "APPLE TV", "APPLE ONE", "TIDAL", "PANDORA",
+    ])
+
+    static let utilities = rules("Utilities", [
+        "CON ED", "CONED", "CON EDISON", "PG E", "PGANDE", "PACIFIC GAS", "SOCALGAS", "SO CAL EDISON",
+        "SOUTHERN CALIFORNIA EDISON", "COMCAST", "XFINITY", "VERIZON", "VZWRLSS", "AT T ", "ATT ", "T MOBILE",
+        "TMOBILE", "SPECTRUM", "CHARTER COMM", "OPTIMUM", "ALTICE", "COX COMM", "GOOGLE FI", "MINT MOBILE",
+        "VISIBLE", "NATIONAL GRID", "DUKE ENERGY", "EVERSOURCE", "DOMINION ENERGY", "GEORGIA POWER",
+        "FPL ", "FLORIDA POWER", "XCEL ENERGY", "DTE ENERGY", "CONSUMERS ENERGY", "PSEG", "PECO ", "COMED",
+        "AMEREN", "ENTERGY", "WATER", "SEWER", "ELECTRIC", "UTILITY", "UTILITIES", "SONIC NET", "STARLINK",
+        "FIOS", "GOOGLE FIBER", "FRONTIER COMM", "CENTURYLINK", "WOW INTERNET",
+    ])
+
+    static let housing = rules("Housing", [
+        "MORTGAGE", "RENT PAYMENT", "BILT RENT", "BILT", "HOA ", "HOMEOWNERS ASSOC", "PROPERTY MGMT",
+        "PROPERTY MANAGEMENT", "APARTMENTS", "APTS", "LEASING OFFICE", "AVALONBAY", "EQUITY RESIDENTIAL",
+        "GREYSTAR", "ZILLOW RENT", "RENTCAFE", "APPFOLIO", "BUILDINGLINK", "CLEANING SERVICE", "HANDY COM",
+        "TASKRABBIT", "MOVERS", "STORAGE", "PUBLIC STORAGE", "CUBESMART", "EXTRA SPACE",
+    ])
+
+    static let health = rules("Health & Fitness", [
+        "CVS", "WALGREENS", "DUANE READE", "RITE AID", "PHARMACY", "DENTAL", "DENTIST", "ORTHODONT",
+        "MEDICAL", "HOSPITAL", "CLINIC", "URGENT CARE", "LABCORP", "QUEST DIAG", "ONE MEDICAL", "1LIFE",
+        "ZOCDOC", "DOCTOR", "PHYSICIAN", "THERAPY", "PHYSICAL THERAPY", "OPTOMETR", "VISION", "EYE CARE",
+        "HEALTH", "EQUINOX", "PLANET FITNESS", "ORANGETHEORY", "SOULCYCLE", "BARRY S", "CLASSPASS", "GYM ",
+        "FITNESS", "YOGA", "PILATES", "CROSSFIT", "LIFE TIME", "24 HOUR FITNESS", "CRUNCH", "F45",
+        "BLINK FITNESS", "HIMS ", "HERS ", "RO ", "NURX", "TALKSPACE", "BETTERHELP", "GNC", "VITAMIN SHOPPE",
+    ])
+
+    static let personalCare = rules("Personal Care", [
+        "SEPHORA", "ULTA", "SALON", "BARBER", "BARBERSHOP", "SPA ", "NAILS", "NAIL ", "DRYBAR", "WAX ",
+        "EUROPEAN WAX", "MASSAGE", "HAIR", "COSMETIC", "GLOSSIER", "DRY CLEAN", "DRYCLEAN", "CLEANERS",
+        "LAUNDRY", "LAUNDROMAT", "TAILOR",
+    ])
+
+    static let entertainment = rules("Entertainment", [
+        "TICKETMASTER", "LIVE NATION", "STUBHUB", "SEATGEEK", "VIVID SEATS", "AXS", "EVENTBRITE", "AMC ",
+        "REGAL", "FANDANGO", "ALAMO DRAFTHOUSE", "CINEMA", "THEATRE", "THEATER", "MUSEUM", "STEAMGAMES",
+        "STEAM PURCHASE", "PLAYSTATION", "XBOX", "NINTENDO", "BOWLERO", "BOWLING", "TOPGOLF", "DAVE BUSTER",
+        "GOLF", "CONCERT", "ZOO ", "AQUARIUM", "SIX FLAGS", "DISNEYLAND", "WALT DISNEY WORLD", "BROADWAY",
+        "TODAYTIX", "SKI ", "EPIC PASS", "IKON PASS", "DRAFTKINGS", "FANDUEL",
+    ])
+
+    static let fees = rules("Fees & Interest", [
+        "INTEREST CHARGE", "INTEREST CHARGED", "PURCHASE INTEREST", "LATE FEE", "LATE PAYMENT FEE",
+        "ANNUAL FEE", "ANNUAL MEMBERSHIP FEE", "MEMBERSHIP FEE", "FOREIGN TRANSACTION", "FOREIGN TRANS FEE",
+        "INTL TRANSACTION FEE", "OVERDRAFT", "NSF FEE", "SERVICE FEE", "MONTHLY SERVICE FEE",
+        "MAINTENANCE FEE", "ATM FEE", "NON WF ATM", "WIRE FEE", "WIRE TRANS SVC CHARGE", "RETURNED ITEM FEE",
+        "CASH ADVANCE FEE", "BALANCE TRANSFER FEE",
+    ])
+
+    static let cash = rules("Cash & ATM", [
+        "ATM WITHDRAWAL", "ATM WITHDRAW", "ATM CASH", "ATM ", "CASH WITHDRAWAL", "WITHDRAWAL MADE IN A BRANCH",
+        "BRANCH WITHDRAWAL",
+    ])
+
+    static let insurance = rules("Insurance", [
+        "GEICO", "STATE FARM", "PROGRESSIVE", "ALLSTATE", "LIBERTY MUTUAL", "LEMONADE", "NATIONWIDE",
+        "FARMERS INS", "TRAVELERS", "USAA INS", "CHUBB", "METLIFE", "PRUDENTIAL", "NORTHWESTERN MUTUAL",
+        "INSURANCE", "INS PREM", "POLICYGENIUS", "HAVEN LIFE", "LADDER LIFE",
+    ])
+
+    static let taxes = rules("Taxes", [
+        "IRS USATAXPYMT", "IRS ", "US TREASURY TAX", "TAX PAYMENT", "TAX PYMT", "NYS DTF", "FRANCHISE TAX",
+        "DEPT OF REVENUE", "DEPARTMENT OF REVENUE", "PROPERTY TAX", "TURBOTAX", "INTUIT TURBOTAX",
+        "H R BLOCK",
+    ])
+
+    static let giving = rules("Gifts & Donations", [
+        "GOFUNDME", "DONATION", "DONATE", "CHARITY", "CHARITABLE", "RED CROSS", "UNICEF", "ACLU", "ACTBLUE",
+        "WINRED", "PLANNED PARENTHOOD", "WIKIMEDIA", "GIVEWELL", "GIVING", "FOUNDATION", "1 800 FLOWERS",
+        "FTD", "GIFT", "EVERY ORG",
+    ])
+
+    static let education = rules("Education", [
+        "COURSERA", "UDEMY", "TUITION", "UNIVERSITY", "COLLEGE", "SCHOOL", "EDX", "SKILLSHARE",
+        "KHAN ACADEMY", "CHEGG", "STUDENT LOAN", "NAVIENT", "NELNET", "SALLIE MAE", "MOHELA",
+    ])
+
+    static let pets = rules("Pets", [
+        "CHEWY", "PETCO", "PETSMART", "VETERINARY", "VET CLINIC", "ANIMAL HOSPITAL", "BANFIELD", "ROVER COM",
+        "WAG LABS", "BARKBOX", "BARK CO", "THE FARMER S DOG", "FARMERS DOG",
+    ])
+
+    static let peer = rules("Venmo & Zelle", [
+        "VENMO", "ZELLE", "CASH APP", "SQUARE CASH", "SQC ", "PAYPAL INST XFER", "APPLE CASH",
+    ])
+
+    static let transfers = rules(SpendingCategory.cardPayment, [
+        // Only issuer-specific or "thank you" wording: generic phrases like "ONLINE PAYMENT"
+        // also appear on utility bill pay, which is real spending. Unlabeled card payments
+        // are still caught by matching the two sides of the payment (see Categorizer).
+        "PAYMENT THANK YOU", "PAYMENT THANK", "THANK YOU FOR YOUR PAYMENT", "PAYMENT RECEIVED",
+        "AUTOPAY PAYMENT", "AUTOMATIC PAYMENT THANK", "AMEX EPAYMENT", "AMERICAN EXPRESS ACH PMT",
+        "AMEX ACH PMT", "CHASE CREDIT CRD", "CHASE CARD SERVICES", "CRCARDPMT", "CREDIT CARD PAYMENT",
+        "CREDIT CRD PAYMENT", "WF CREDIT CARD", "WELLS FARGO CARD", "CITI AUTOPAY", "CITI CARD ONLINE",
+        "DISCOVER E PAYMENT", "CAPITAL ONE ONLINE PMT", "CAPITAL ONE MOBILE PMT", "APPLECARD GSBANK",
+        "GSBANK PAYMENT", "BARCLAYCARD", "BANK OF AMERICA CREDIT CARD BILL PAYMENT",
+    ]) + rules(SpendingCategory.transfer, [
+        "ONLINE TRANSFER", "TRANSFER TO", "TRANSFER FROM", "XFER", "ONLINE XFER", "INTERNAL TRANSFER",
+        "FUNDS TRANSFER", "BOOK TRANSFER", "WIRE TRANSFER", "SAVINGS TRANSFER",
+    ]) + rules("Investment Transfer", [
+        "ROBINHOOD", "FIDELITY", "SCHWAB", "VANGUARD", "COINBASE", "KRAKEN", "GEMINI TRUST", "E TRADE", "ETRADE",
+        "MORGAN STANLEY", "MSSB", "WEALTHFRONT", "BETTERMENT", "M1 FINANCE", "PUBLIC COM", "TD AMERITRADE",
+        "INTERACTIVE BROKERS", "IBKR", "ACORNS", "STASH ", "CARTA ", "ANGELLIST", "AL ADVISORS",
+    ])
+
+    static let income = rules("Paycheck", [
+        "PAYROLL", "DIR DEP", "DIRECT DEP", "DIRECT DEPOSIT", "DIRECTDEP", "SALARY", "ADP WAGE", "ADP PAYROLL",
+        "GUSTO", "PAYCHEX", "RIPPLING", "JUSTWORKS", "TRINET", "WORKDAY", "INSPERITY", "ZENEFITS",
+    ]) + rules("Interest & Dividends", [
+        "INTEREST PAYMENT", "INTEREST PAID", "INTEREST EARNED", "INTEREST CREDIT", "INTEREST DEPOSIT",
+        "DIVIDEND", "CASH REWARD", "REWARDS REDEMPTION", "STATEMENT CREDIT REWARD",
+    ]) + rules(SpendingCategory.otherIncome, [
+        "TAX REF", "IRS TREAS 310", "TREAS 310", "STATE TAX REF", "MOBILE DEPOSIT", "REMOTE DEPOSIT",
+        "CHECK DEPOSIT", "DEPOSIT MADE IN A BRANCH",
+    ])
+}
