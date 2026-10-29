@@ -42,7 +42,7 @@ struct AddWalletView: View {
                     } header: {
                         Text("Public address")
                     } footer: {
-                        Text(help(for: source))
+                        Text(addressHelp(for: source))
                     }
                 } else {
                     Section {
@@ -86,7 +86,7 @@ struct AddWalletView: View {
         }
     }
 
-    private func help(for source: CryptoSource) -> String {
+    private func addressHelp(for source: CryptoSource) -> String {
         switch source {
         case .bitcoin:
             "Paste a receiving address, or your wallet's xpub to include every address it has used. Add one entry per address if your wallet only shows a zpub."

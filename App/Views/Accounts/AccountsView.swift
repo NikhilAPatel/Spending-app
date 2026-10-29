@@ -23,7 +23,7 @@ struct AccountsView: View {
                                 Text("Connected")
                             }
                         }
-                        ForEach(model.data.simpleFINMessages, id: \.self) { message in
+                        ForEach(Array(model.data.simpleFINMessages.enumerated()), id: \.offset) { _, message in
                             Label(message, systemImage: "exclamationmark.triangle.fill")
                                 .font(.footnote)
                                 .symbolRenderingMode(.multicolor)

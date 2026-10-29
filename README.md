@@ -82,7 +82,7 @@ Card payments and transfers between your own accounts are recognized two ways: b
 
 - Your data is a single file in the app's private storage. It's encrypted while the phone is locked and included in your encrypted device backup.
 - Credentials (the SimpleFIN access key and Kraken keys) live in the iOS keychain. They're marked "this device only", so they're not synced or backed up.
-- Face ID (or your passcode) is required to open the app. Balances are hidden in the app switcher. You can turn this off in Accounts.
+- Face ID (or your passcode) is required to open the app and after it's been in the background for more than 5 minutes. The short grace period lets you switch to Safari to copy a token or key without losing what you'd typed. Balances are always hidden in the app switcher. You can turn the lock off in Accounts.
 - **Accounts > Erase all data** deletes everything, keys included.
 - The app talks only to the services it reads from:
   - `bridge.simplefin.org` (or wherever your SimpleFIN token points)

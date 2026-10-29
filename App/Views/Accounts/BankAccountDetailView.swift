@@ -18,10 +18,19 @@ private struct BankAccountForm: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @State private var draft: BankAccount
+    /// Edited separately and committed on Return or when leaving, so typing doesn't save per keystroke.
+    @State private var nickname: String
     @State private var confirmingRemove = false
 
     init(account: BankAccount) {
         _draft = State(initialValue: account)
+        _nickname = State(initialValue: account.nickname ?? "")
+    }
+
+    private func commitNickname() {
+        let trimmed = nickname.trimmingCharacters(in: .whitespaces)
+        let value = trimmed.isEmpty ? nil : trimmed
+        if draft.nickname != value { draft.nickname = value }
     }
 
     var body: some View {
@@ -45,10 +54,9 @@ private struct BankAccountForm: View {
             }
 
             Section {
-                TextField("Nickname", text: Binding(
-                    get: { draft.nickname ?? "" },
-                    set: { draft.nickname = $0.isEmpty ? nil : $0 }
-                ), prompt: Text(draft.name))
+                TextField("Nickname", text: $nickname, prompt: Text(draft.name))
+                    .submitLabel(.done)
+                    .onSubmit(commitNickname)
                 Picker("Type", selection: $draft.kind) {
                     ForEach(AccountKind.allCases) { kind in
                         Text(kind.displayName).tag(kind)
@@ -104,6 +112,7 @@ private struct BankAccountForm: View {
         .onChange(of: draft) { _, updated in
             model.updateAccount(updated)
         }
+        .onDisappear(perform: commitNickname)
         .confirmationDialog("Remove \(draft.displayName)?", isPresented: $confirmingRemove, titleVisibility: .visible) {
             Button("Remove", role: .destructive) {
                 model.removeAccount(id: draft.id)

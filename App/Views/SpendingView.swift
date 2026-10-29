@@ -16,6 +16,7 @@ struct SpendingView: View {
             List {
                 Section {
                     MonthSwitcher(month: selected, canGoForward: selected < current) { month = $0 }
+                        .padding(.vertical, 2)
                     SpendingTotals(summary: summary)
                 }
 
@@ -77,12 +78,12 @@ struct SpendingView: View {
 struct MonthSwitcher: View {
     let month: MonthKey
     let canGoForward: Bool
-    let onChange: (MonthKey) -> Void
+    let onStep: (MonthKey) -> Void
 
     var body: some View {
         HStack {
             Button {
-                onChange(month.adding(months: -1))
+                onStep(month.adding(months: -1))
             } label: {
                 Image(systemName: "chevron.left")
             }
@@ -92,7 +93,7 @@ struct MonthSwitcher: View {
                 .font(.headline)
             Spacer()
             Button {
-                onChange(month.adding(months: 1))
+                onStep(month.adding(months: 1))
             } label: {
                 Image(systemName: "chevron.right")
             }

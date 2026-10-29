@@ -56,6 +56,18 @@ final class TestClock: @unchecked Sendable {
         #expect(saved.simpleFINConnected)
     }
 
+    @Test func failedFirstSyncStillKeepsTheConnection() async throws {
+        http.on(url: "/claim/", body: Fixtures.accessURL)
+        http.on(url: "/simplefin/accounts", status: 500, body: "oops")
+        let model = makeModel()
+        // The token is spent once claimed, so this must not throw and send the user back to re-enter it.
+        try await model.connectSimpleFIN(setupToken: setupToken)
+        #expect(model.data.simpleFINConnected)
+        #expect(secrets.secret(for: SecretKey.simpleFINAccessURL) == Fixtures.accessURL)
+        #expect(model.refreshMessages.first?.contains("first sync failed") == true)
+        #expect(model.data.lastSimpleFINSync == nil)
+    }
+
     @Test func pullToRefreshRespectsSimpleFINRateLimit() async throws {
         stubSimpleFIN()
         let model = makeModel()

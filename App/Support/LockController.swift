@@ -34,6 +34,11 @@ final class LockController {
     func lock() {
         isUnlocked = false
     }
+
+    /// For when the user turns the lock on from inside the already-open app.
+    func markUnlocked() {
+        isUnlocked = true
+    }
 }
 
 struct LockedView: View {

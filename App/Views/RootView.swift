@@ -5,6 +5,11 @@ struct RootView: View {
     @Environment(AppModel.self) private var model
     @Environment(LockController.self) private var lock
     @Environment(\.scenePhase) private var scenePhase
+    @State private var backgroundedAt: Date?
+
+    /// Leaving the app briefly (to copy a SimpleFIN token or a Kraken key) doesn't lock it,
+    /// so half-filled screens survive. The app-switcher snapshot is still hidden.
+    private static let lockGracePeriod: TimeInterval = 5 * 60
 
     private var isLocked: Bool { model.data.requireFaceID && !lock.isUnlocked }
 
@@ -28,8 +33,15 @@ struct RootView: View {
         .onChange(of: scenePhase) { _, phase in
             switch phase {
             case .background:
-                lock.lock()
+                backgroundedAt = Date()
             case .active:
+                // The Face ID prompt itself makes the app briefly inactive; only a real trip
+                // to the background (not a cancelled prompt) should prompt again.
+                guard let since = backgroundedAt else { break }
+                backgroundedAt = nil
+                if Date().timeIntervalSince(since) > Self.lockGracePeriod {
+                    lock.lock()
+                }
                 Task {
                     if model.data.requireFaceID { await lock.unlock() }
                     await model.refreshIfStale()
@@ -37,6 +49,10 @@ struct RootView: View {
             default:
                 break
             }
+        }
+        .onChange(of: model.data.requireFaceID) { _, isRequired in
+            // Turning the lock on (or erasing data, which resets it) shouldn't lock you out mid-session.
+            if isRequired { lock.markUnlocked() }
         }
     }
 }
@@ -69,7 +85,7 @@ struct RefreshStatusSection: View {
                         Text("Updating…").foregroundStyle(.secondary)
                     }
                 }
-                ForEach(model.refreshMessages, id: \.self) { message in
+                ForEach(Array(model.refreshMessages.enumerated()), id: \.offset) { _, message in
                     Label {
                         Text(message).font(.footnote)
                     } icon: {

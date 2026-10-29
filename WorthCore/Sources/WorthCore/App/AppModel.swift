@@ -177,13 +177,20 @@ public final class AppModel {
     // MARK: - SimpleFIN
 
     /// Claims a setup token from SimpleFIN Bridge and pulls the first 90 days of data.
+    /// Throws only if the claim fails. Once claimed the token is spent, so a failed first
+    /// sync is reported as a refresh message and retried on the next refresh instead.
     public func connectSimpleFIN(setupToken: String) async throws {
         let accessURL = try await SimpleFINClient(http: http).claim(setupToken: setupToken)
         try secrets.setSecret(accessURL, for: SecretKey.simpleFINAccessURL)
         data.simpleFINConnected = true
         data.lastSimpleFINSync = nil
         persist()
-        try await syncBanks()
+        do {
+            try await syncBanks()
+            refreshMessages = data.simpleFINMessages
+        } catch {
+            refreshMessages = ["Connected to SimpleFIN, but the first sync failed: \(error.localizedDescription) Pull down to retry."]
+        }
         recordSnapshot()
         persist()
     }
