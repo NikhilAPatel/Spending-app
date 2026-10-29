@@ -58,9 +58,9 @@ import Testing
         let checking = BankAccount(id: "chk", name: "Checking", institution: "WF", balance: 100, balanceDate: Date(), kind: .cash)
         let card = BankAccount(id: "card", name: "Card", institution: "Chase", balance: -100, balanceDate: Date(), kind: .creditCard)
         let txs = [
-            Transaction(id: "1", accountId: "chk", date: date("2025-10-01"), amount: -40, description: "MYSTERY MERCHANT"),
-            Transaction(id: "2", accountId: "chk", date: date("2025-10-02"), amount: 900, description: "WIRE FROM CAP TABLE LLC"),
-            Transaction(id: "3", accountId: "card", date: date("2025-10-03"), amount: -12, description: "STARBUCKS"),
+            BankTransaction(id: "1", accountId: "chk", date: date("2025-10-01"), amount: -40, description: "MYSTERY MERCHANT"),
+            BankTransaction(id: "2", accountId: "chk", date: date("2025-10-02"), amount: 900, description: "WIRE FROM CAP TABLE LLC"),
+            BankTransaction(id: "3", accountId: "card", date: date("2025-10-03"), amount: -12, description: "STARBUCKS"),
         ]
         let result = Categorizer(overrides: ["3": "Business"]).categorize(txs, accounts: [checking, card])
         #expect(result[0].category == SpendingCategory.uncategorized)
@@ -77,17 +77,17 @@ import Testing
         let card = BankAccount(id: "amex", name: "Platinum", institution: "Amex", balance: -100, balanceDate: Date(), kind: .creditCard)
         let txs = [
             // Card payment where neither side has a recognizable description.
-            Transaction(id: "p1", accountId: "chk", date: date("2025-10-01"), amount: dec("-1204.18"), description: "ACH DEBIT AMERICAN EXPRESS"),
-            Transaction(id: "p2", accountId: "amex", date: date("2025-10-03"), amount: dec("1204.18"), description: "CREDIT ADJ"),
+            BankTransaction(id: "p1", accountId: "chk", date: date("2025-10-01"), amount: dec("-1204.18"), description: "ACH DEBIT AMERICAN EXPRESS"),
+            BankTransaction(id: "p2", accountId: "amex", date: date("2025-10-03"), amount: dec("1204.18"), description: "CREDIT ADJ"),
             // Unlabeled checking -> savings move.
-            Transaction(id: "t1", accountId: "chk", date: date("2025-10-05"), amount: -500, description: "WF WEB 12345"),
-            Transaction(id: "t2", accountId: "sav", date: date("2025-10-05"), amount: 500, description: "WF WEB 12345"),
+            BankTransaction(id: "t1", accountId: "chk", date: date("2025-10-05"), amount: -500, description: "WF WEB 12345"),
+            BankTransaction(id: "t2", accountId: "sav", date: date("2025-10-05"), amount: 500, description: "WF WEB 12345"),
             // Same amount but too far apart: not a transfer.
-            Transaction(id: "x1", accountId: "chk", date: date("2025-10-01"), amount: -75, description: "THING"),
-            Transaction(id: "x2", accountId: "amex", date: date("2025-10-20"), amount: 75, description: "OTHER THING"),
+            BankTransaction(id: "x1", accountId: "chk", date: date("2025-10-01"), amount: -75, description: "THING"),
+            BankTransaction(id: "x2", accountId: "amex", date: date("2025-10-20"), amount: 75, description: "OTHER THING"),
             // Labeled on the card side only.
-            Transaction(id: "l1", accountId: "chk", date: date("2025-10-10"), amount: -300, description: "AMEX ACH"),
-            Transaction(id: "l2", accountId: "amex", date: date("2025-10-11"), amount: 300, description: "PAYMENT RECEIVED - THANK YOU"),
+            BankTransaction(id: "l1", accountId: "chk", date: date("2025-10-10"), amount: -300, description: "AMEX ACH"),
+            BankTransaction(id: "l2", accountId: "amex", date: date("2025-10-11"), amount: 300, description: "PAYMENT RECEIVED - THANK YOU"),
         ]
         let byID = Dictionary(uniqueKeysWithValues: Categorizer().categorize(txs, accounts: [checking, savings, card]).map { ($0.id, $0) })
         #expect(byID["p1"]?.category == SpendingCategory.cardPayment)
@@ -102,11 +102,11 @@ import Testing
     }
 
     @Test func suggestedPatternRemovesBankBoilerplate() {
-        let wf = Transaction(id: "1", accountId: "a", date: Date(), amount: -5, description: "PURCHASE AUTHORIZED ON 10/12 BLUE BOTTLE COFFEE SAN FRANCISCO CA S384286027381843 CARD 1234")
+        let wf = BankTransaction(id: "1", accountId: "a", date: Date(), amount: -5, description: "PURCHASE AUTHORIZED ON 10/12 BLUE BOTTLE COFFEE SAN FRANCISCO CA S384286027381843 CARD 1234")
         #expect(AppModel.suggestedPattern(for: wf) == "BLUE BOTTLE COFFEE")
-        let square = Transaction(id: "2", accountId: "a", date: Date(), amount: -5, description: "SQ *JOES PIZZA #42")
+        let square = BankTransaction(id: "2", accountId: "a", date: Date(), amount: -5, description: "SQ *JOES PIZZA #42")
         #expect(AppModel.suggestedPattern(for: square) == "JOES PIZZA")
-        let payee = Transaction(id: "3", accountId: "a", date: Date(), amount: -5, description: "UBER *EATS 8005928996", payee: "Uber Eats")
+        let payee = BankTransaction(id: "3", accountId: "a", date: Date(), amount: -5, description: "UBER *EATS 8005928996", payee: "Uber Eats")
         #expect(AppModel.suggestedPattern(for: payee) == "UBER EATS")
     }
 }
@@ -118,14 +118,14 @@ import Testing
 
     @Test func monthlySummaryNetsRefundsAndSkipsTransfers() {
         let txs = [
-            Transaction(id: "1", accountId: "card", date: date("2025-10-03"), amount: -100, description: "AMAZON.COM"),
-            Transaction(id: "2", accountId: "card", date: date("2025-10-09"), amount: 30, description: "AMAZON.COM REFUND"),
-            Transaction(id: "3", accountId: "card", date: date("2025-10-10"), amount: -50, description: "STARBUCKS"),
-            Transaction(id: "4", accountId: "chk", date: date("2025-10-15"), amount: 4000, description: "ACME PAYROLL"),
-            Transaction(id: "5", accountId: "chk", date: date("2025-10-20"), amount: -800, description: "CHASE CREDIT CRD AUTOPAY"),
-            Transaction(id: "6", accountId: "card", date: date("2025-10-21"), amount: 800, description: "AUTOMATIC PAYMENT - THANK YOU"),
-            Transaction(id: "7", accountId: "card", date: date("2025-09-28"), amount: -999, description: "STARBUCKS"),
-            Transaction(id: "8", accountId: "rh", date: date("2025-10-05"), amount: -2000, description: "BUY VTI"),
+            BankTransaction(id: "1", accountId: "card", date: date("2025-10-03"), amount: -100, description: "AMAZON.COM"),
+            BankTransaction(id: "2", accountId: "card", date: date("2025-10-09"), amount: 30, description: "AMAZON.COM REFUND"),
+            BankTransaction(id: "3", accountId: "card", date: date("2025-10-10"), amount: -50, description: "STARBUCKS"),
+            BankTransaction(id: "4", accountId: "chk", date: date("2025-10-15"), amount: 4000, description: "ACME PAYROLL"),
+            BankTransaction(id: "5", accountId: "chk", date: date("2025-10-20"), amount: -800, description: "CHASE CREDIT CRD AUTOPAY"),
+            BankTransaction(id: "6", accountId: "card", date: date("2025-10-21"), amount: 800, description: "AUTOMATIC PAYMENT - THANK YOU"),
+            BankTransaction(id: "7", accountId: "card", date: date("2025-09-28"), amount: -999, description: "STARBUCKS"),
+            BankTransaction(id: "8", accountId: "rh", date: date("2025-10-05"), amount: -2000, description: "BUY VTI"),
         ]
         let categorized = Categorizer().categorize(txs, accounts: [checking, card, brokerage])
         let summary = SpendingReport.summary(

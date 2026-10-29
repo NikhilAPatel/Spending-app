@@ -91,7 +91,7 @@ public struct Holding: Codable, Hashable, Sendable {
     }
 }
 
-public struct Transaction: Codable, Identifiable, Hashable, Sendable {
+public struct BankTransaction: Codable, Identifiable, Hashable, Sendable {
     /// Unique across accounts: "<accountId>|<SimpleFIN transaction id>".
     public var id: String
     public var accountId: String

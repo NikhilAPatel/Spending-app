@@ -75,7 +75,7 @@ public struct CryptoHolding: Codable, Hashable, Sendable, Identifiable {
     /// Tokens found in a wallet never are: anyone can airdrop a fake "USDC" or "ETH".
     public var priceBySymbol: Bool?
 
-    public var id: String { "\(symbol)|\(name ?? "")" }
+    public var id: String { "\(symbol)|\(name ?? "")|\(quantity)" }
 
     public init(symbol: String, name: String? = nil, quantity: Decimal, priceUSD: Decimal? = nil, fixedValueUSD: Decimal? = nil, priceBySymbol: Bool = false) {
         self.symbol = symbol

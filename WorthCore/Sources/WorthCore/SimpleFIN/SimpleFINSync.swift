@@ -4,7 +4,7 @@ import Foundation
 public enum SimpleFINSync {
     public struct Result: Sendable {
         public var accounts: [BankAccount]
-        public var transactions: [Transaction]
+        public var transactions: [BankTransaction]
     }
 
     /// - Parameter windowStart: the `start-date` that was requested. Stored transactions for a
@@ -12,7 +12,7 @@ public enum SimpleFINSync {
     ///   and pending charges don't linger once they post (often under a new id).
     public static func merge(
         accounts existingAccounts: [BankAccount],
-        transactions existingTransactions: [Transaction],
+        transactions existingTransactions: [BankTransaction],
         with response: SimpleFINAccountSet,
         windowStart: Date?,
         now: Date = Date()
@@ -50,7 +50,7 @@ public enum SimpleFINSync {
             }
 
             let fresh = remote.transactions.map { tx in
-                Transaction(
+                BankTransaction(
                     id: "\(remote.id)|\(tx.id)",
                     accountId: remote.id,
                     date: tx.date(fallback: now),

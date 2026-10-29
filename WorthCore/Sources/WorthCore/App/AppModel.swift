@@ -198,9 +198,14 @@ public final class AppModel {
 
     // MARK: - Accounts
 
+    /// Applies the user-editable settings (type, nickname, include toggles). Balances and
+    /// holdings only come from SimpleFIN, so a stale copy from an open screen can't revert a sync.
     public func updateAccount(_ account: BankAccount) {
         guard let index = data.accounts.firstIndex(where: { $0.id == account.id }) else { return }
-        data.accounts[index] = account
+        data.accounts[index].kind = account.kind
+        data.accounts[index].nickname = account.nickname
+        data.accounts[index].includeInNetWorth = account.includeInNetWorth
+        data.accounts[index].includeInSpending = account.includeInSpending
         recategorize()
         recordSnapshot()
         persist()
@@ -298,7 +303,7 @@ public final class AppModel {
     // MARK: - Categories
 
     /// Sets the category for one transaction, or for every transaction matching `rulePattern`.
-    public func setCategory(_ category: String, for transaction: Transaction, rulePattern: String? = nil) {
+    public func setCategory(_ category: String, for transaction: BankTransaction, rulePattern: String? = nil) {
         if let pattern = rulePattern?.trimmingCharacters(in: .whitespaces), !pattern.isEmpty {
             data.rules.removeAll { Categorizer.normalize($0.pattern) == Categorizer.normalize(pattern) }
             data.rules.append(CategoryRule(pattern: pattern, category: category))
@@ -314,7 +319,7 @@ public final class AppModel {
         persist()
     }
 
-    public func clearOverride(for transaction: Transaction) {
+    public func clearOverride(for transaction: BankTransaction) {
         data.overrides[transaction.id] = nil
         recategorize()
         persist()
@@ -336,7 +341,7 @@ public final class AppModel {
 
     /// A merchant pattern for "always categorize like this", with bank boilerplate removed:
     /// "PURCHASE AUTHORIZED ON 10/12 BLUE BOTTLE COFFEE SAN FRANCISCO CA S3842 CARD 1234" -> "BLUE BOTTLE COFFEE".
-    nonisolated public static func suggestedPattern(for transaction: Transaction) -> String {
+    nonisolated public static func suggestedPattern(for transaction: BankTransaction) -> String {
         let noise: Set<String> = [
             "PURCHASE", "AUTHORIZED", "ON", "POS", "DEBIT", "CARD", "CHECKCARD", "RECURRING", "PAYMENT",
             "SQ", "TST", "APLPAY", "ACH", "WEB", "PPD", "CCD", "ID", "INC", "LLC", "CO", "THE", "WWW", "COM",

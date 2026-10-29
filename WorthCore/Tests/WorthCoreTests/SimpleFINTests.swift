@@ -96,7 +96,7 @@ import Testing
         state.accounts[1].nickname = "Amex Plat"
         state.accounts[0].includeInNetWorth = false
         // An older transaction outside the next window must survive.
-        let old = Transaction(id: "ACT-amex|OLD", accountId: "ACT-amex", date: date("2025-09-01"), amount: -10, description: "OLD")
+        let old = BankTransaction(id: "ACT-amex|OLD", accountId: "ACT-amex", date: date("2025-09-01"), amount: -10, description: "OLD")
         state.transactions.append(old)
 
         // Next sync: the pending pizza charge posted under a new id.
@@ -120,7 +120,7 @@ import Testing
         ]}
         """
         let response = try JSONDecoder().decode(SimpleFINAccountSet.self, from: Data(json.utf8))
-        let existing = Transaction(id: "ACT-c|1", accountId: "ACT-c", date: date("2025-10-25"), amount: -20, description: "LUNCH")
+        let existing = BankTransaction(id: "ACT-c|1", accountId: "ACT-c", date: date("2025-10-25"), amount: -20, description: "LUNCH")
         let account = BankAccount(id: "ACT-c", name: "Sapphire", institution: "Chase", balance: -40, balanceDate: date("2025-10-25"), kind: .creditCard)
         let merged = SimpleFINSync.merge(accounts: [account], transactions: [existing], with: response, windowStart: date("2025-10-20"), now: date("2025-10-28"))
         #expect(merged.transactions == [existing])

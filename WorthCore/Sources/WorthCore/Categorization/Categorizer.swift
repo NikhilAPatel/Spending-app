@@ -13,7 +13,7 @@ public struct CategorizedTransaction: Identifiable, Hashable, Sendable {
         case fallback
     }
 
-    public var transaction: Transaction
+    public var transaction: BankTransaction
     public var category: String
     public var kind: CategoryKind
     public var source: Source
@@ -87,7 +87,7 @@ public struct Categorizer: Sendable {
         return (rule.category, rule.isUserRule)
     }
 
-    public func categorize(_ transactions: [Transaction], accounts: [BankAccount]) -> [CategorizedTransaction] {
+    public func categorize(_ transactions: [BankTransaction], accounts: [BankAccount]) -> [CategorizedTransaction] {
         let accountsByID = Dictionary(accounts.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
 
         var results = transactions.map { transaction -> CategorizedTransaction in
@@ -111,7 +111,7 @@ public struct Categorizer: Sendable {
         return results
     }
 
-    private func fallbackCategory(for transaction: Transaction, account: BankAccount?) -> String {
+    private func fallbackCategory(for transaction: BankTransaction, account: BankAccount?) -> String {
         if transaction.amount > 0 && account?.kind == .cash {
             return SpendingCategory.otherIncome
         }

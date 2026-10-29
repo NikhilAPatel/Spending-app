@@ -1,0 +1,52 @@
+# Xcode project definition. Generate Worth.xcodeproj with:
+#   brew install xcodegen && xcodegen
+# Re-run `xcodegen` after pulling changes that add or remove files.
+name: Worth
+options:
+  bundleIdPrefix: com.nikhilapatel
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+
+packages:
+  WorthCore:
+    path: WorthCore
+
+settings:
+  base:
+    # Optional: put your 10-character Apple Team ID here so you don't have to pick
+    # the team in Xcode after every `xcodegen` run (Xcode > Settings > Accounts shows it).
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+
+targets:
+  Worth:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+    dependencies:
+      - package: WorthCore
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Worth
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        LSRequiresIPhoneOS: true
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        NSFaceIDUsageDescription: Worth uses Face ID to keep your finances private.
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nikhilapatel.worth
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.0"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        ENABLE_PREVIEWS: true

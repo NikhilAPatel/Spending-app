@@ -51,11 +51,11 @@ public struct CategoryRule: Codable, Identifiable, Hashable, Sendable {
 /// Everything the app persists, except secrets (those live in the keychain).
 public struct AppData: Codable, Sendable {
     public var accounts: [BankAccount] = []
-    public var transactions: [Transaction] = []
+    public var transactions: [BankTransaction] = []
     public var wallets: [CryptoWallet] = []
     public var manualAssets: [ManualAsset] = []
     public var rules: [CategoryRule] = []
-    /// Transaction id -> category name, set when the user recategorizes one transaction.
+    /// BankTransaction id -> category name, set when the user recategorizes one transaction.
     public var overrides: [String: String] = [:]
     public var customCategories: [SpendingCategory] = []
     public var snapshots: [NetWorthSnapshot] = []
@@ -77,7 +77,7 @@ public struct AppData: Codable, Sendable {
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         accounts = try c.decodeIfPresent([BankAccount].self, forKey: .accounts) ?? []
-        transactions = try c.decodeIfPresent([Transaction].self, forKey: .transactions) ?? []
+        transactions = try c.decodeIfPresent([BankTransaction].self, forKey: .transactions) ?? []
         wallets = try c.decodeIfPresent([CryptoWallet].self, forKey: .wallets) ?? []
         manualAssets = try c.decodeIfPresent([ManualAsset].self, forKey: .manualAssets) ?? []
         rules = try c.decodeIfPresent([CategoryRule].self, forKey: .rules) ?? []
